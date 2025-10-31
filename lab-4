@@ -1,0 +1,46 @@
+#include <avr/io.h>
+
+uint8_t value = 0;
+uint8_t value_out;
+
+void setup() {
+  Serial.begin(9600);
+
+  DDRB &= ~(1 << PB0);  // Set PB0 as input for button
+  PORTB |= (1 << PB0);  // Enable pull-up resistor for button
+
+  EEARL = 0x00;         // Set EEPROM address to 0
+
+  EECR |= (1 << EERE);  // Read from EEPROM
+  value = EEDR;         // Copy EEPROM value to our variable
+}
+
+void loop() {
+  // Check if button is pressed (active low)
+  if (~(PINB) & (1 << PB0)) { 
+    value += 1;          // Increase counter
+    delay(200);          // Wait for button to settle
+  }
+
+  // Wait until EEPROM is ready for writing
+  while ((EECR & (1 << EEPE))) {
+    // Waiting for previous write to finish
+  }
+  
+  EEDR = value;          // Put our value in Data Register
+  EECR |= (1 << EEMPE);  // Enable EEPROM write
+  EECR |= (1 << EEPE);   // Start writing to EEPROM
+
+  // Wait until write operation completes
+  while (EECR & (1 << EEPE)) {
+    // Waiting for write to finish
+  }
+  
+  EECR |= (1 << EERE);   // Read from EEPROM
+  value_out = EEDR;      // Store read value in variable
+
+  // Print the counter value
+  Serial.print(value_out);
+  Serial.print("\n");
+  delay(200);
+}
