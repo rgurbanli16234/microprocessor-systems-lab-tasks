@@ -1,0 +1,35 @@
+#include <avr/io.h>
+#include <util/delay.h>
+
+int main(void) {
+    // Set pin PB5 as output
+    DDRB |= (1 << DDB5);
+    
+    while (1) {
+        // METHOD 1: Direct assignment with binary and hex
+        PORTB = 0b00100000;  // Turn LED ON (binary)
+        _delay_ms(500);
+        PORTB = 0x00;        // Turn LED OFF (hex)
+        _delay_ms(500);
+        
+        // METHOD 2: Bit set/clear with masking
+        /*
+        PORTB |= (1 << PB5);   // Set bit 5 to 1 (LED ON)
+        _delay_ms(500);
+        PORTB &= ~(1 << PB5);  // Clear bit 5 to 0 (LED OFF)
+        _delay_ms(500);
+        */
+        
+        // METHOD 3: Bit toggle with XOR
+        /*
+        PORTB ^= (1 << PB5);   // Toggle bit 5 (change state)
+        _delay_ms(500);
+        */
+        
+        // METHOD 4: Using PIN register to toggle
+        /*
+        PINB = (1 << PINB5);   // Writing 1 to PIN register toggles the pin
+        _delay_ms(500);
+        */
+    }
+}
