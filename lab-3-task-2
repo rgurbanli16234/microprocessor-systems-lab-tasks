@@ -1,0 +1,29 @@
+#include <avr/io.h>
+
+int8_t result;
+
+void setup() {
+  Serial.begin(9600);
+
+  asm volatile(
+    "LDI R16, 0 \n\t"  // Start counter at 0
+    "LDI R17, 10 \n\t" // Set limit to 10
+    "LDI R18, 0 \n\t"  // Start sum at 0
+
+    "LOOP: \n\t"
+    " INC R16 \n\t"    // Increase counter by 1
+    " ADD R18, R16 \n\t" // Add counter to sum
+    " CP R16, R17 \n\t" // Compare counter with limit
+    " BRLT LOOP \n\t"   // If less than 10, jump to loop
+    "MOV %0, R18 \n\t"  // Copy final result to variable
+    : "=r"(result)      // Output to result variable
+    :
+    : "r16", "r17", "r18" // Registers we used
+  );
+}
+
+void loop() {
+  // Print the result
+  Serial.print(result);
+  delay(3000);
+}
