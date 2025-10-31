@@ -1,0 +1,18 @@
+#include <avr/io.h>
+
+int main(void) {
+    // Use inline assembly to work with registers directly
+    asm volatile(
+        "ldi r16, 5     \n\t"  // Load the value 5 into register R16
+        "ldi r17, 8     \n\t"  // Load the value 8 into register R17
+        "add r16, r17   \n\t"  // Add R17 to R16, result stays in R16
+        "mov r18, r16   \n\t"  // Copy the result from R16 to R18
+        :
+        : 
+        : "r16", "r17", "r18"  // Inform the compiler we used these registers
+    );
+
+    while (1) {
+        // Infinite loop to keep the program running
+    }
+}
