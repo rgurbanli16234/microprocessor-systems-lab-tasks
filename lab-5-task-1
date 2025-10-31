@@ -1,0 +1,59 @@
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <util/delay.h>
+
+// Counter for Timer1 interrupts
+volatile uint16_t timer1Counter = 0;
+// Counter for Timer2 interrupts  
+volatile uint16_t timer2Counter = 0;
+
+void setup(void) {
+    // Set PB0, PB1, PB2 as outputs for LEDs
+    DDRB |= (1 << PB0) | (1 << PB1) | (1 << PB2);
+    // Turn all LEDs off initially
+    PORTB &= ~((1 << PB0) | (1 << PB1) | (1 << PB2));
+    
+    // Configure Timer1 for CTC mode with prescaler 256
+    TCCR1A = 0x00; 
+    TCCR1B = (1 << WGM12) | (1 << CS12);  
+    OCR1A = 31249; 
+    // Enable Timer1 compare interrupt
+    TIMSK1 = (1 << OCIE1A); 
+    TCNT1 = 0;
+    
+    // Configure Timer2 for normal mode with prescaler 1024
+    TCCR2A = 0x00; 
+    TCCR2B = (1 << CS22) | (1 << CS21) | (1 << CS20); 
+    // Enable Timer2 overflow interrupt
+    TIMSK2 = (1 << TOIE2);  
+    TCNT2 = 0;
+    
+    // Enable all interrupts globally
+    sei(); 
+}
+
+// Timer1 Compare Match Interrupt
+ISR(TIMER1_COMPA_vect) {
+    timer1Counter++;
+    // Toggle PB1 LED every 2 interrupts (about 1 second)
+    if (timer1Counter >= 2) { 
+        PORTB ^= (1 << PB1); 
+        timer1Counter = 0;
+    }
+}
+
+// Timer2 Overflow Interrupt  
+ISR(TIMER2_OVF_vect) {
+    timer2Counter++;
+    // Toggle PB2 LED every 122 interrupts (about 2 seconds)
+    if (timer2Counter >= 122) {  
+        PORTB ^= (1 << PB2); 
+        timer2Counter = 0;
+    }
+}
+
+void loop(void) {
+    // Toggle PB0 LED every 500ms using delay
+    PORTB ^= (1 << PB0);
+    _delay_ms(500);
+}
