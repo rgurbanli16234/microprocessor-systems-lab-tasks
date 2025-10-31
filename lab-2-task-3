@@ -1,0 +1,30 @@
+#include <avr/io.h>
+
+int main(void) {
+    uint8_t result;
+    uint8_t status_flags;
+    
+    // Use inline assembly to work with registers directly
+    asm volatile(
+        "ldi r16, 50    \n\t"  // Load the value 50 into register R16
+        "ldi r17, 200   \n\t"  // Load the value 200 into register R17
+        "sub r16, r17   \n\t"  // Subtract R17 from R16, result in R16
+        "mov r18, r16   \n\t"  // Copy the result from R16 to R18
+        "in %0, SREG    \n\t"  // Read Status Register flags
+        : "=r" (status_flags), "=r" (result)
+        : 
+        : "r16", "r17", "r18"
+    );
+
+    // Check the status flags
+    if (status_flags & (1 << 1)) {  // Check Carry flag (bit 1)
+        // Carry occurred - result is negative (in two's complement)
+    }
+    if (status_flags & (1 << 2)) {  // Check Zero flag (bit 2)
+        // Result is zero
+    }
+
+    while (1) {
+        // Infinite loop to keep the program running
+    }
+}
