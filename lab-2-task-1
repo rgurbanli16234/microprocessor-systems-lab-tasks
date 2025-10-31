@@ -1,0 +1,20 @@
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+int main(void) {
+    DDRD &= ~(1 << DDD2);    // Pin 2 input
+    PORTD |= (1 << PORTD2);  // Pull-up on
+    DDRB |= (1 << DDB5);     // Pin 13 output
+    
+    EICRA |= (1 << ISC01);   // Falling edge
+    EIMSK |= (1 << INT0);    // INT0 on
+    sei();                   // Interrupts on
+
+    while (1) {
+        // Can do other work
+    }
+}
+
+ISR(INT0_vect) {
+    PORTB ^= (1 << PORTB5);  // Toggle LED
+}
