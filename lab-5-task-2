@@ -1,0 +1,31 @@
+#include <avr/io.h>
+
+void setup(void) {
+    // Set PD6 and PD5 as outputs for PWM (Timer0)
+    DDRD |= (1 << PD6) | (1 << PD5);
+    // Set PB1 as output for PWM (Timer1)
+    DDRB |= (1 << PB1);
+    
+    // Configure Timer0 for Fast PWM mode
+    TCCR0A |= (1 << WGM00) | (1 << WGM01);
+    // Enable non-inverting PWM on OC0A and OC0B
+    TCCR0A |= (1 << COM0A1) | (1 << COM0B1);
+    // Start Timer0 with no prescaler
+    TCCR0B |= (1 << CS00);
+    
+    // Configure Timer1 for Fast PWM 8-bit mode
+    TCCR1A |= (1 << WGM10) | (1 << COM1A1);
+    // Set PWM mode and start Timer1 with no prescaler
+    TCCR1B |= (1 << WGM12) | (1 << CS00);
+    
+    // Set OCR0A to 30% duty cycle for LED1 (76 of 255)
+    OCR0A = 76;
+    // Set OCR0B to 80% duty cycle for LED2 (204 of 255)
+    OCR0B = 204;
+    // Set OCR1A to 50% duty cycle for LED3 (128 of 255)
+    OCR1A = 128;
+}
+
+void loop(void) {
+    // Empty loop - PWM runs automatically in hardware
+}
